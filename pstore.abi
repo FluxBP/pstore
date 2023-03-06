@@ -12,7 +12,7 @@
                     "type": "name"
                 },
                 {
-                    "name": "pagename",
+                    "name": "filename",
                     "type": "name"
                 }
             ]
@@ -26,7 +26,7 @@
                     "type": "name"
                 },
                 {
-                    "name": "pagename",
+                    "name": "filename",
                     "type": "name"
                 }
             ]
@@ -40,8 +40,26 @@
                     "type": "name"
                 },
                 {
-                    "name": "pagename",
+                    "name": "filename",
                     "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "file",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "top",
+                    "type": "uint32"
+                },
+                {
+                    "name": "published",
+                    "type": "bool"
                 }
             ]
         },
@@ -60,24 +78,6 @@
             ]
         },
         {
-            "name": "page",
-            "base": "",
-            "fields": [
-                {
-                    "name": "owner",
-                    "type": "name"
-                },
-                {
-                    "name": "top",
-                    "type": "uint32"
-                },
-                {
-                    "name": "published",
-                    "type": "bool"
-                }
-            ]
-        },
-        {
             "name": "reset",
             "base": "",
             "fields": [
@@ -86,7 +86,7 @@
                     "type": "name"
                 },
                 {
-                    "name": "pagename",
+                    "name": "filename",
                     "type": "name"
                 }
             ]
@@ -100,7 +100,7 @@
                     "type": "name"
                 },
                 {
-                    "name": "pagename",
+                    "name": "filename",
                     "type": "name"
                 }
             ]
@@ -114,7 +114,7 @@
                     "type": "name"
                 },
                 {
-                    "name": "pagename",
+                    "name": "filename",
                     "type": "name"
                 },
                 {
@@ -136,7 +136,7 @@
                     "type": "name"
                 },
                 {
-                    "name": "pagename",
+                    "name": "filename",
                     "type": "name"
                 },
                 {
@@ -185,15 +185,15 @@
     ],
     "tables": [
         {
-            "name": "nodes",
-            "type": "node",
+            "name": "files",
+            "type": "file",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
         },
         {
-            "name": "pages",
-            "type": "page",
+            "name": "nodes",
+            "type": "node",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
