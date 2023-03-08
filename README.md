@@ -5,7 +5,7 @@ For a sample web application that retrieves PermaStore files from the blockchain
 
 # Downloading and uploading files
 
-To download or upload files to PermaStore, one option is to use the standard `cleos` command-line tool that comes with Antelope implementations. Then it's just a matter of understanding what all the actions on the PermaStore contract does, which can be gleaned from the `pstore.cpp` source file. 
+To download or upload files to PermaStore, one option is to use the standard `cleos` command-line tool that comes with Antelope implementations. Then it's just a matter of understanding what all the actions on the PermaStore contract do, which can be gleaned from the `pstore.cpp` source file. 
 
 Another option is to use the `storeos` command-line tool. It is a single-file Perl script that can be downloaded from the root directory of the [PermaServe](https://github.com/fcecin/pserve) repository. Run the script without arguments to see the tool help.
 
