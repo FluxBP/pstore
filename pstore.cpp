@@ -59,13 +59,41 @@ public:
 
   /*
     Create a new file.
+
+    Short names are free to create by anyone.
+    Filenames with dots (actual dots, not invisible trailing dots that short names have)
+      can only be created by the bid winner or the account whose name is the suffix.
    */
   [[eosio::action]]
   void create( name owner, name filename ) {
     require_auth( owner );
+
+    // File must be new.
     files fls( _self, filename.value );
     auto pit = fls.begin();
     check( pit == fls.end(), "File exists." );
+
+    // Filename authorization check.
+    uint32_t fnlen = filename.length();
+    uint64_t tmp = filename.value >> 4;
+    bool visible_dot = false;
+    for( uint32_t i = 0; i < fnlen; ++i ) {
+      visible_dot |= !(tmp & 0x1f);
+      tmp >>= 5;
+    }
+    if ( visible_dot ) {
+      auto suffix = filename.suffix();
+      name_bid_table bids(SYSTEM_CONTRACT, SYSTEM_CONTRACT.value);
+      auto current = bids.find( suffix.value );
+      if ( current != bids.end() ) {
+        check( current->high_bid < 0, "suffix not sold" );
+        check( current->high_bidder == owner, "suffix not owned" );
+      } else {
+        check( owner == suffix, "only suffix may create this filename" );
+      }
+    }
+
+    // Create file.
     fls.emplace( owner, [&]( auto& p ) {
       p.owner = owner;
       p.top = 0;
@@ -119,7 +147,7 @@ public:
     files::const_iterator pit = auth_and_find_file( owner, filename, fls );
     check( pit->published, "File not published." );
     fls.modify( pit, same_payer, [&]( auto& p ) {
-      p.owner = ".immutable."_n;
+      p.owner = ""_n; // should be impossible to create an account with the empty name
     });
   }
 
@@ -176,6 +204,21 @@ public:
   }
 
 private:
+
+  // Expected name table from the system contract deployed at the system account.
+  // If your blockchain has different parameters for this, you must set it here.
+  static constexpr name SYSTEM_CONTRACT = "eosio"_n;
+  struct name_bid {
+    name            newname;
+    name            high_bidder;
+    int64_t         high_bid;
+    time_point      last_bid_time;
+    uint64_t primary_key()const { return newname.value;                    }
+    uint64_t by_high_bid()const { return static_cast<uint64_t>(-high_bid); }
+  };
+  typedef eosio::multi_index< "namebids"_n, name_bid,
+    indexed_by<"highbid"_n, const_mem_fun<name_bid, uint64_t, &name_bid::by_high_bid> >
+    > name_bid_table;
 
   void clear_nodes( name filename ) {
     nodes nds( _self, filename.value );
