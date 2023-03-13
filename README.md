@@ -10,3 +10,6 @@ To download or upload files to PermaStore, one option is to use the standard `cl
 
 Another option is to use the `storeos` command-line tool. It is a single-file Perl script that can be downloaded from the root directory of the [PermaServe](https://github.com/fcecin/pserve) repository. Run the script without arguments to see the tool help.
 
+# Known deployments
+
+* [UX Network](https://uxnetwork.io): account [permastoreux](https://explorer.uxnetwork.io/account/permastoreux)
