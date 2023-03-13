@@ -66,6 +66,7 @@ public:
    */
   [[eosio::action]]
   void create( name owner, name filename ) {
+    check( filename.value != 0, "Empty filename." );
     require_auth( owner );
 
     // File must be new.
@@ -74,22 +75,15 @@ public:
     check( pit == fls.end(), "File exists." );
 
     // Filename authorization check.
-    uint32_t fnlen = filename.length();
-    uint64_t tmp = filename.value >> 4;
-    bool visible_dot = false;
-    for( uint32_t i = 0; i < fnlen; ++i ) {
-      visible_dot |= !(tmp & 0x1f);
-      tmp >>= 5;
-    }
-    if ( visible_dot ) {
-      auto suffix = filename.suffix();
+    auto suffix = filename.suffix();
+    if ( suffix != filename ) {
       name_bid_table bids(SYSTEM_CONTRACT, SYSTEM_CONTRACT.value);
       auto current = bids.find( suffix.value );
       if ( current != bids.end() ) {
-        check( current->high_bid < 0, "suffix not sold" );
-        check( current->high_bidder == owner, "suffix not owned" );
+        check( current->high_bid < 0, "Suffix not sold." );
+        check( current->high_bidder == owner, "Suffix not owned." );
       } else {
-        check( owner == suffix, "only suffix may create this filename" );
+        check( owner == suffix, "Only suffix may create this filename." );
       }
     }
 
