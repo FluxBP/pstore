@@ -60,13 +60,15 @@ public:
   /*
     Create a new file.
 
-    Short names are free to create by anyone.
+    Short names are free to create by anyone if the name has never been bid on.
     Filenames with dots (actual dots, not invisible trailing dots that short names have)
-      can only be created by the bid winner or the account whose name is the suffix.
+      and short names that have ever been bid on can only be created by the bid winner
+      or the account whose name is the suffix.
    */
   [[eosio::action]]
   void create( name owner, name filename ) {
-    check( filename.value != 0, "Empty filename." );
+    uint8_t fnlen = filename.length();
+    check( fnlen >= 1 && fnlen <= 12 , "Invalid filename." );
     require_auth( owner );
 
     // File must be new.
@@ -76,14 +78,17 @@ public:
 
     // Filename authorization check.
     auto suffix = filename.suffix();
-    if ( suffix != filename ) {
+    bool is_short = fnlen < 12;
+    if ( suffix != filename || is_short ) { // Must check name if either dotted or short.
       name_bid_table bids(SYSTEM_CONTRACT, SYSTEM_CONTRACT.value);
       auto current = bids.find( suffix.value );
       if ( current != bids.end() ) {
-        check( current->high_bid < 0, "Suffix not sold." );
-        check( current->high_bidder == owner, "Suffix not owned." );
+        check( current->high_bid < 0, "Suffix auction open." );
+        check( current->high_bidder == owner, "Suffix winning bid not owned." );
       } else {
-        check( owner == suffix, "Only suffix may create this filename." );
+        // Bid doesn't exist on the name. If you own (i.e. are) the name, it's fine. If you don't, then
+        //   you can still be fine if it's an undotted name of an account that doesn't exist yet.
+        check( owner == suffix || (suffix == filename && !is_account(suffix) ), "Suffix account not owned." );
       }
     }
 
